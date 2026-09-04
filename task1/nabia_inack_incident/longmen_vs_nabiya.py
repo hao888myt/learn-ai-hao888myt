@@ -206,10 +206,9 @@ def main_battle_loop(
                     base_damage,
                     nagato_defense_bonus,
                 )
+                nagato_defense_bonus = 0
             case "defend":
                 nabiya_defense_bonus = calculate_defense_value(NABIYA_DEFEND_DICE)
-
-        nagato_defense_bonus = 0
 
         if is_battle_over(nagato_hp, nabiya_hp):
             break
