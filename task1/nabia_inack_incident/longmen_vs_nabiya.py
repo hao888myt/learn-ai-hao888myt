@@ -32,7 +32,7 @@ def display_status(character_name: str, current_hp: int, max_hp: int) -> None:
     # TODO：检查最大生命值是否合法，并使用 print() 输出角色状态。
     if max_hp > 0 and max_hp >= current_hp:
         print(f"[{character_name}]HP: {current_hp} / {max_hp}")
-    elif max_hp < 0:
+    elif max_hp <= 0:
         raise ValueError(f"[{character_name}]最大HP: {max_hp} 不合法! 应大于0!")
     elif max_hp < current_hp:
         raise ValueError(
@@ -43,8 +43,8 @@ def display_status(character_name: str, current_hp: int, max_hp: int) -> None:
 def roll_dice(num_dice: int) -> int:
     """投掷指定数量的六面骰子并返回点数总和。"""
     # TODO：先处理非法骰子数量，再用 while 循环调用 random.randint(1, 6)。
-    if num_dice <= 0:
-        raise ValueError(f"当前骰子数量: {num_dice} 非法! 应大于0!")
+    if num_dice < 0:
+        raise ValueError(f"当前骰子数量: {num_dice} 非法! 应大于等于0!")
 
     total_num: int = 0
 
@@ -134,17 +134,11 @@ def main_battle_loop(
     pause_seconds: float = 0.0,
     max_turns: int = MAX_BATTLE_TURNS,
 ) -> BattleResult:
-    """运行完整战斗，并返回 nagato、nabiya 或 draw。"""
-    # TODO：先检查 pause_seconds 和 max_turns 是否合理，不合理时抛出 ValueError。
-
     if pause_seconds < 0:
         raise ValueError(f"当前pause_seconds: {pause_seconds} 不合法! 应大于等于0!")
 
     if max_turns <= 0:
         raise ValueError(f"当前pause_seconds: {max_turns} 不合法! 应大于0!")
-
-    # TODO：初始化 nagato_hp、nabiya_hp、nagato_defense_bonus、
-    # TODO：nabiya_defense_bonus，以及从 1 开始的 turn。
 
     nagato_hp: int = NAGATO_MAX_HP
     nabiya_hp: int = NABIYA_MAX_HP
@@ -154,21 +148,12 @@ def main_battle_loop(
 
     turn: int = 1
 
-    # TODO：战斗循环可以按照下面的结构开始：
-    # while nagato_hp > 0 and nabiya_hp > 0 and turn <= max_turns:
-    #     输出当前回合和双方状态。
+    while not is_battle_over(nagato_hp, nabiya_hp) and turn <= max_turns:
+        print(f"\n======== 第 {turn} 回合 ========")
+        display_status("长门", nagato_hp, NAGATO_MAX_HP)
+        display_status("娜比娅", nabiya_hp, NABIYA_MAX_HP)
 
-    while nagato_hp > 0 and nabiya_hp > 0 and turn <= max_turns:
-        # TODO：长门回合：
-        # 1. 调用 choose_nagato_action(nagato_hp, nabiya_hp) 获取 action。
-        # 2. action == "attack" 时，调用 calculate_attack_damage()；
-        #    如果 check_critical_hit() 返回 True，就把基础伤害翻倍。
-        # 3. action == "defend" 时，调用 calculate_defense_value()，
-        #    把结果保存到 nagato_defense_bonus。
-        # 4. action == "special" 时，用 random.random() 判断是否小于
-        #    SPECIAL_ATTACK_SUCCESS_RATE；成功时使用 SPECIAL_ATTACK_DAMAGE。
-        # 5. 造成伤害时统一调用 apply_damage()，并在攻击后清零对方的防御值。
-        # 6. 长门行动后，如果 is_battle_over() 返回 True，使用 break 结束循环。
+        print("\n>>> 长门的回合")
 
         match choose_nagato_action(nagato_hp, nabiya_hp):
             case "attack":
@@ -178,13 +163,20 @@ def main_battle_loop(
 
                 nabiya_hp = apply_damage(nabiya_hp, base_damage, nabiya_defense_bonus)
                 nabiya_defense_bonus = 0
+                print(f"长门造成了伤害，娜比娅剩余 {nabiya_hp} 点生命值。")
+
             case "defend":
                 nagato_defense_bonus = calculate_defense_value(NAGATO_DEFEND_DICE)
+                print(f"长门进入防御姿态，获得 {nagato_defense_bonus} 点防御值。")
+
             case "special":
                 base_damage: int = calculate_attack_damage(NAGATO_ATTACK_DICE)
 
                 if random.random() < SPECIAL_ATTACK_SUCCESS_RATE:
                     base_damage = SPECIAL_ATTACK_DAMAGE
+                    print(f"长门的特殊攻击成功，娜比娅剩余 {nabiya_hp} 点生命值。")
+                else:
+                    print("长门的特殊攻击失败了，伤害维持原样。")
 
                 nabiya_hp = apply_damage(nabiya_hp, base_damage, nabiya_defense_bonus)
                 nabiya_defense_bonus = 0
@@ -192,11 +184,7 @@ def main_battle_loop(
         if is_battle_over(nagato_hp, nabiya_hp):
             break
 
-        # TODO：娜比娅回合：
-        # 1. 调用 nabiya_ai_action(nabiya_hp) 获取 enemy_action。
-        # 2. attack 时调用 calculate_attack_damage()，再用 apply_damage()
-        #    扣除长门生命值；defend 时保存娜比娅的防御值。
-        # 3. 娜比娅的攻击或防御结束后，清零已经消耗的长门防御值。
+        print("\n>>> 娜比娅的回合")
 
         match nabiya_ai_action(nabiya_hp):
             case "attack":
@@ -207,17 +195,18 @@ def main_battle_loop(
                     nagato_defense_bonus,
                 )
                 nagato_defense_bonus = 0
+                print(f"娜比娅发起攻击，长门剩余 {nagato_hp} 点生命值。")
+
             case "defend":
                 nabiya_defense_bonus = calculate_defense_value(NABIYA_DEFEND_DICE)
+                print(f"娜比娅进入防御姿态，获得 {nabiya_defense_bonus} 点防御值。")
 
         if is_battle_over(nagato_hp, nabiya_hp):
             break
 
-        # TODO：双方回合完成后让 turn 增加 1，并根据 pause_seconds 调用 time.sleep()。
         turn += 1
         time.sleep(pause_seconds)
 
-    # TODO：循环结束后调用 get_battle_result()，输出中文结果并返回 result。
     result = get_battle_result(nagato_hp, nabiya_hp)
 
     match result:
