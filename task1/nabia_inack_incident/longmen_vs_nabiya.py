@@ -150,7 +150,7 @@ def main_battle_loop(
     nabiya_hp: int = NABIYA_MAX_HP
 
     nagato_defense_bonus: int = 0
-    nabiya_defense_bonus: int = calculate_defense_value(NABIYA_DEFEND_DICE)
+    nabiya_defense_bonus: int = 0
 
     turn: int = 1
 
