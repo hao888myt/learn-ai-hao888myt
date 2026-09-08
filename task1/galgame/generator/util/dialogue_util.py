@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 
@@ -95,10 +96,28 @@ def to_dict(obj: Any) -> Any:
         return obj
 
 
-class GroupManager:
-    def __init__(self, groups: list[DialogueGroup | ChoiceGroup]):
+class DialogueExporter:
+    def __init__(
+        self,
+        file_name: str,
+        groups: list[DialogueGroup | ChoiceGroup],
+    ):
+        output_dir: Path
+
+        current = Path(__file__).resolve()
+        for parent in current.parents:
+            if parent.name == "galgame":
+                output_dir = parent / "data"
+                break
+        else:
+            output_dir = Path("galgame/data")
+
+        output_path = Path(output_dir) / f"{file_name}.json"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
         data = to_dict({"groups": groups})
 
-        with open("dialogues.json", "w", encoding="utf-8") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print("已生成 dialogues.json")
+
+        print(f"已生成 {file_name}.json 于 {output_path}")
