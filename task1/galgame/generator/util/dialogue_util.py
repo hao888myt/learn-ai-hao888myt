@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from typing import Any, List, Union, cast
+from typing import Any
 
 
 class Dialogue:
@@ -56,6 +56,7 @@ class Choice:
 
 class DialogueGroup:
     def __init__(self, id: str, dialogues: list[Dialogue], group_to: str):
+        self.type = "dialogue_group"
         self.id = id
         self.dialogues = dialogues
         self.group_to = group_to
@@ -63,6 +64,7 @@ class DialogueGroup:
 
 class ChoiceGroup:
     def __init__(self, id: str, desc: str, choices: list[Choice]):
+        self.type = "choice_group"
         self.id = id
         self.desc = desc
         self.choices = choices
@@ -74,14 +76,14 @@ def to_dict(obj: Any) -> Any:
     elif isinstance(obj, list):
         return [to_dict(item) for item in obj]  # type: ignore
     elif isinstance(obj, dict):
-        return {key: to_dict(value) for key, value in obj.items()}
+        return {key: to_dict(value) for key, value in obj.items()}  # type: ignore
     elif hasattr(obj, "__dict__"):
         result: dict[str, Any] = {}
         for key, value in obj.__dict__.items():
             if isinstance(value, list):
-                result[key] = [to_dict(item) for item in value]
+                result[key] = [to_dict(item) for item in value]  # type: ignore
             elif isinstance(value, dict):
-                result[key] = {k: to_dict(v) for k, v in value.items()}
+                result[key] = {k: to_dict(v) for k, v in value.items()}  # type: ignore
             elif isinstance(value, Enum):
                 result[key] = value.value
             elif hasattr(value, "__dict__"):
@@ -95,46 +97,7 @@ def to_dict(obj: Any) -> Any:
 
 class GroupManager:
     def __init__(self, groups: list[DialogueGroup | ChoiceGroup]):
-        data: dict[str, list[dict[str, Any]]] = {"groups": []}
-
-        for group in groups:
-            if isinstance(group, DialogueGroup):
-                group_dict: dict[str, Any] = {
-                    "id": group.id,
-                    "dialogues": [],
-                    "group_to": group.group_to,
-                }
-
-                for dialogue in group.dialogues:
-                    group_dict["dialogues"].append(
-                        {
-                            "type": "dialogue",
-                            "name": dialogue.name,
-                            "content": dialogue.content,
-                        }
-                    )
-
-                data["groups"].append(group_dict)
-
-            else:
-                group_dict: dict[str, Any] = {
-                    "id": group.id,
-                    "desc": group.desc,
-                    "choices": [],
-                }
-
-                for choice in group.choices:
-                    group_dict["choices"].append(
-                        {
-                            "type": "choice",
-                            "character": choice.character,
-                            "content": choice.content,
-                            "group_to": choice.group_to,
-                            "affinity": choice.effects,
-                        }
-                    )
-
-                data["groups"].append(group_dict)
+        data = to_dict({"groups": groups})
 
         with open("dialogues.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
