@@ -71,6 +71,7 @@ class ChoiceGroup:
         self.choices = choices
 
 
+# Pylance我错了喵，泥不要在用类型不确定肘击我了
 def to_dict(obj: Any) -> Any:
     if isinstance(obj, Enum):
         return obj.value
@@ -104,6 +105,7 @@ class DialogueExporter:
     ):
         output_dir: Path
 
+        # 判断galgame/data文件夹在哪
         current = Path(__file__).resolve()
         for parent in current.parents:
             if parent.name == "galgame":
@@ -113,10 +115,14 @@ class DialogueExporter:
             output_dir = Path("galgame/data")
 
         output_path = Path(output_dir) / f"{file_name}.json"
+
+        # 一键创建目录
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # 数据导出
         data = to_dict({"groups": groups})
 
+        # 生成json文件
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
