@@ -15,8 +15,8 @@ class ConditionType(Enum):
 
 
 class Condition:
-    def __init__(self, condition_type: ConditionType, value: Any) -> None:
-        self.condition_type = condition_type
+    def __init__(self, type: ConditionType, value: Any) -> None:
+        self.type = type
         self.value = value
 
 
@@ -25,8 +25,8 @@ class EffectType(Enum):
 
 
 class Effect:
-    def __init__(self, effect_type: EffectType, value: Any) -> None:
-        self.effect_type = effect_type
+    def __init__(self, type: EffectType, value: Any) -> None:
+        self.type = type
         self.value = value
 
 
