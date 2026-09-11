@@ -10,6 +10,12 @@ class Dialogue:
         self.content = content
 
 
+class Narration(Dialogue):
+    def __init__(self, content: str):
+        self.name = ""
+        self.content = content
+
+
 class ConditionType(Enum):
     REQUIRED_AFFINITY = "required_affinity"
 
