@@ -43,5 +43,21 @@ def instantiate_all() -> list[Any]:
 
     return to_dict(results)
 
+
+def create_new_save():
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if parent.name == "galgame":
+            output_dir = parent / "save"
+            break
+    else:
+        output_dir = Path("galgame/save")
+
+    output_path = Path(output_dir) / "data.json"
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(instantiate_all(), f, ensure_ascii=False, indent=2)
+
+
 if __name__ == "__main__":
     run_all_generators()
