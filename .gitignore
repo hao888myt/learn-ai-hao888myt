@@ -1,2 +1,5 @@
 .vscode/settings.json
-task1/nabia_inack_incident/__pycache__/
+
+__pycache__/
+*.pyc
+*.pyo
