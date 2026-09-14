@@ -77,13 +77,16 @@ class DialogueGroup:
     def __init__(
         self,
         id: str,
-        dialogues: list[Dialogue],
+        dialogues: list[Dialogue | str],
         group_to: str,
         file_to: str = "",
     ):
         self.type = "dialogue_group"
         self.id = id
-        self.dialogues = dialogues
+        self.dialogues = [
+            Narration(dialogue) if isinstance(dialogue, str) else dialogue
+            for dialogue in dialogues
+        ]
         self.group_to = group_to
         self.file_to = (
             Path(inspect.stack()[1].filename).stem if file_to == "" else file_to
