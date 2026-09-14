@@ -1,10 +1,9 @@
+from .dialogue_helper import Dialogue
+
+
 class Character:
-    def __init__(self, name: str, affinity: int = 0):
+    def __init__(self, name: str):
         self.name = name
-        self.affinity = affinity
 
-    def modify_affinity(self, value: int) -> None:
-        self.affinity += value
-
-    def set_affinity(self, value: int) -> None:
-        self.affinity = value
+    def talk(self, content: str) -> Dialogue:
+        return Dialogue(self.name, content)
