@@ -1,7 +1,10 @@
+import inspect
 import json
 from enum import Enum
 from pathlib import Path
 from typing import Any
+
+from generator.util.util import to_dict
 
 
 class Dialogue:
@@ -37,10 +40,19 @@ class Effect:
 
 
 class Choice:
-    def __init__(self, character: str, content: str, group_to: str):
+    def __init__(
+        self,
+        character: str,
+        content: str,
+        group_to: str,
+        file_to: str = "",
+    ):
         self.character = character
         self.content = content
         self.group_to = group_to
+        self.file_to = (
+            Path(inspect.stack()[1].filename).stem if file_to == "" else file_to
+        )
         self.effects: list[Effect] = []
         self.conditions: list[Condition] = []
 
@@ -62,11 +74,20 @@ class Choice:
 
 
 class DialogueGroup:
-    def __init__(self, id: str, dialogues: list[Dialogue], group_to: str):
+    def __init__(
+        self,
+        id: str,
+        dialogues: list[Dialogue],
+        group_to: str,
+        file_to: str = "",
+    ):
         self.type = "dialogue_group"
         self.id = id
         self.dialogues = dialogues
         self.group_to = group_to
+        self.file_to = (
+            Path(inspect.stack()[1].filename).stem if file_to == "" else file_to
+        )
 
 
 class ChoiceGroup:
@@ -77,36 +98,9 @@ class ChoiceGroup:
         self.choices = choices
 
 
-# Pylance我错了喵，泥不要在用类型不确定肘击我了
-def to_dict(obj: Any) -> Any:
-    if isinstance(obj, Enum):
-        return obj.value
-    elif isinstance(obj, list):
-        return [to_dict(item) for item in obj]  # type: ignore
-    elif isinstance(obj, dict):
-        return {key: to_dict(value) for key, value in obj.items()}  # type: ignore
-    elif hasattr(obj, "__dict__"):
-        result: dict[str, Any] = {}
-        for key, value in obj.__dict__.items():
-            if isinstance(value, list):
-                result[key] = [to_dict(item) for item in value]  # type: ignore
-            elif isinstance(value, dict):
-                result[key] = {k: to_dict(v) for k, v in value.items()}  # type: ignore
-            elif isinstance(value, Enum):
-                result[key] = value.value
-            elif hasattr(value, "__dict__"):
-                result[key] = to_dict(value)
-            else:
-                result[key] = value
-        return result
-    else:
-        return obj
-
-
 class DialogueExporter:
     def __init__(
         self,
-        file_name: str,
         groups: list[DialogueGroup | ChoiceGroup],
     ):
         output_dir: Path
@@ -119,6 +113,8 @@ class DialogueExporter:
                 break
         else:
             output_dir = Path("galgame/data")
+
+        file_name = Path(inspect.stack()[1].filename).stem
 
         output_path = Path(output_dir) / f"{file_name}.json"
 
