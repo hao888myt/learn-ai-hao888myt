@@ -8,10 +8,10 @@ from generator.util.util import to_dict
 
 
 def run_all_generators():
-    for f in Path("generator/scene").glob("*.py"):
-        if f.name.startswith("__"):
+    for file in Path("generator/scene").glob("*.py"):
+        if file.name.startswith("__"):
             continue
-        name = f.stem
+        name = file.stem
         module = importlib.import_module(f"generator.scene.{name}")
         if hasattr(module, "generator"):
             module.generator()
