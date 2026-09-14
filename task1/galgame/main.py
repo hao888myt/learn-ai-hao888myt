@@ -61,3 +61,8 @@ def create_new_save():
 
 if __name__ == "__main__":
     run_all_generators()
+
+    folder = Path("save")
+    if not any(folder.iterdir()):
+        print("没有玩家存档，正在创建中")
+        create_new_save()
