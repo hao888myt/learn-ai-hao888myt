@@ -1,10 +1,9 @@
-from generator.util.character import Character
+from generator.util.romanceable_character import RomanceableCharacter
 
 
-class XiaoBai(Character):
-    def __init__(self, affinity: int = 0):
+class XiaoBai(RomanceableCharacter):
+    def __init__(self):
         super().__init__("小白")
-        self.affinity = affinity
 
 
-小白 = XiaoBai(0)
+小白 = XiaoBai()
