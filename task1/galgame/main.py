@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from generator.util.util import to_dict
+from generator.util.util import get_galgame_path, to_dict
 
 
 def run_all_generators():
@@ -44,16 +44,9 @@ def instantiate_all() -> list[Any]:
     return to_dict(results)
 
 
-def create_new_save():
-    current = Path(__file__).resolve()
-    for parent in current.parents:
-        if parent.name == "galgame":
-            output_dir = parent / "save"
-            break
-    else:
-        output_dir = Path("galgame/save")
+def create_new_game():
 
-    output_path = Path(output_dir) / "data.json"
+    output_path = get_galgame_path() / "save" / "data.json"
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(instantiate_all(), f, ensure_ascii=False, indent=2)
@@ -65,4 +58,4 @@ if __name__ == "__main__":
     folder = Path("save")
     if not any(folder.iterdir()):
         print("没有玩家存档，正在创建中")
-        create_new_save()
+        create_new_game()

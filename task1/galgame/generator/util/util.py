@@ -1,4 +1,5 @@
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 
@@ -26,3 +27,15 @@ def to_dict(obj: Any) -> Any:
         return result
     else:
         return obj
+
+
+def get_galgame_path():
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if parent.name == "galgame":
+            path = parent
+            break
+    else:
+        path = Path("galgame")
+
+    return path
