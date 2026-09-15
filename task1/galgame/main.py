@@ -7,6 +7,8 @@ from typing import Any
 from classes.loader.file_loader import FileLoader
 from classes.util.util import get_galgame_path, to_dict
 
+SAVE_PATH = Path("data/save")
+
 
 def run_all_generators():
     for file in Path("scene").glob("*.py"):
@@ -46,14 +48,14 @@ def instantiate_all() -> dict[str, Any]:
 
 
 def create_new_game():
-    output_path = get_galgame_path() / "data" / "save" / "data.json"
+    output_path = get_galgame_path() / SAVE_PATH / "data.json"
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(instantiate_all(), f, ensure_ascii=False, indent=2)
 
 
 def load_game():
-    file = FileLoader("data/save", "data").get_json()
+    file = FileLoader(SAVE_PATH, "data").get_json()
 
     characters = file.get("characters")
     if isinstance(characters, list):
@@ -69,7 +71,7 @@ def save_game():
 if __name__ == "__main__":
     run_all_generators()
 
-    folder = Path("data/save")
+    folder = SAVE_PATH
     if not any(folder.iterdir()):
         print("没有玩家存档，正在创建中")
         create_new_game()

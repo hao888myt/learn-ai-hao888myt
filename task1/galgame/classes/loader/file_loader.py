@@ -1,11 +1,12 @@
 import json
+from pathlib import Path
 from typing import Any
 
 from classes.util.util import get_galgame_path
 
 
 class FileLoader:
-    def __init__(self, path: str, file_name: str):
+    def __init__(self, path: Path, file_name: str):
 
         self.file_path = get_galgame_path() / path / f"{file_name}.json"
 
