@@ -1,5 +1,8 @@
-.vscode/settings.json
+.vscode/
 
 __pycache__/
 *.pyc
 *.pyo
+
+task1/galgame/data/
+task1/galgame/save/

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from generator.util.util import get_galgame_path, to_dict
+from loader.file_loader import FileLoader
 
 
 def run_all_generators():
@@ -19,7 +20,7 @@ def run_all_generators():
             print(f"{name}.py没有generator()函数")
 
 
-def instantiate_all() -> list[Any]:
+def instantiate_all() -> dict[str, Any]:
     """实例化character文件夹的所有类"""
     folder: str = "character"
     results: list[Any] = []
@@ -41,15 +42,28 @@ def instantiate_all() -> list[Any]:
                 results.append(instance)  # type: ignore
                 print(f"已实例化 {module_name}.{name}")
 
-    return to_dict(results)
+    return {"characters": to_dict(results)}
 
 
 def create_new_game():
-
     output_path = get_galgame_path() / "save" / "data.json"
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(instantiate_all(), f, ensure_ascii=False, indent=2)
+
+
+def load_game():
+    file = FileLoader("save", "data").get_json()
+
+    characters = file.get("characters")
+    if isinstance(characters, list):
+        for character in characters:  # type: ignore
+            if isinstance(character, dict) and character.get("name") == "我":  # type: ignore
+                print(character)  # type: ignore
+
+
+def save_game():
+    pass
 
 
 if __name__ == "__main__":
@@ -59,3 +73,5 @@ if __name__ == "__main__":
     if not any(folder.iterdir()):
         print("没有玩家存档，正在创建中")
         create_new_game()
+
+    load_game()

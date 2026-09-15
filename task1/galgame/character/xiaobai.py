@@ -4,6 +4,3 @@ from generator.util.romanceable_character import RomanceableCharacter
 class XiaoBai(RomanceableCharacter):
     def __init__(self):
         super().__init__("小白")
-
-
-小白 = XiaoBai()
