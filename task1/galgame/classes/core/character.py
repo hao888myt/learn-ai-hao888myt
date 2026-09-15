@@ -1,4 +1,4 @@
-from .dialogue_helper import Dialogue
+from ..util.dialogue_helper import Dialogue
 
 
 class Character:

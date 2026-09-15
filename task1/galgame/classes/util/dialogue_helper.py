@@ -4,7 +4,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from generator.util.util import to_dict
+from classes.util.util import to_dict
 
 
 class Dialogue:
@@ -112,10 +112,10 @@ class DialogueExporter:
         current = Path(__file__).resolve()
         for parent in current.parents:
             if parent.name == "galgame":
-                output_dir = parent / "data"
+                output_dir = parent / "data" / "scene"
                 break
         else:
-            output_dir = Path("galgame/data")
+            output_dir = Path("galgame/data/scene")
 
         file_name = Path(inspect.stack()[1].filename).stem
 

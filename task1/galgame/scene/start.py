@@ -1,4 +1,4 @@
-from generator.util.dialogue_helper import (
+from classes.util.dialogue_helper import (
     Choice,
     ChoiceGroup,
     DialogueExporter,

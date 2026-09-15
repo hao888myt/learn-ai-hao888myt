@@ -1,6 +1,6 @@
 import sys
 
-from generator.util.character import Character
+from classes.core.character import Character
 
 
 class Game:

@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from generator.util.util import get_galgame_path
+from classes.util.util import get_galgame_path
 
 
 class FileLoader:

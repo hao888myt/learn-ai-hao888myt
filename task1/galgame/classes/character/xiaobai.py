@@ -1,4 +1,4 @@
-from generator.util.romanceable_character import RomanceableCharacter
+from classes.core.romanceable_character import RomanceableCharacter
 
 
 class XiaoBai(RomanceableCharacter):
