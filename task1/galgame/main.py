@@ -34,7 +34,7 @@ def instantiate_all() -> dict[str, Any]:
         module_name = py_file.stem
 
         # 动态导入
-        module = importlib.import_module(f"classes.character.{module_name}")
+        module = importlib.import_module(f"{folder.replace("/", ".")}.{module_name}")
 
         # 找模块里的类
         for name, obj in inspect.getmembers(module, inspect.isclass):
