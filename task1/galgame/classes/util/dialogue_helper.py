@@ -125,7 +125,11 @@ class DialogueExporter:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 数据导出
-        data = to_dict({"groups": groups})
+        data: dict[str, dict[str, Any]] = {}
+        for group in groups:
+            group_dict = to_dict(group)
+            group_dict.pop("id", None)
+            data[group.id] = group_dict
 
         # 生成json文件
         with open(output_path, "w", encoding="utf-8") as f:

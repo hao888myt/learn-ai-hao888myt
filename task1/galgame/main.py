@@ -76,4 +76,4 @@ if __name__ == "__main__":
         print("没有玩家存档，正在创建中")
         create_new_game()
 
-    load_game()
+    # load_game()
