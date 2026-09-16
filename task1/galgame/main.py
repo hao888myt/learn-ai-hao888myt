@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from classes.data_class.save_data import SaveData
 from classes.loader.file_loader import FileLoader
 from classes.util.util import get_galgame_path, to_dict
 
@@ -24,27 +25,29 @@ def run_all_generators():
 
 def instantiate_all() -> dict[str, Any]:
     """实例化character文件夹的所有类"""
-    folder: str = "classes/character"
-    results: list[Any] = []
+    folder: str = "classes/data_class"
+    results: dict[str, Any] = {}
 
-    for py_file in Path(folder).glob("*.py"):
-        if py_file.name.startswith("__"):
-            continue
+    py_file = Path(f"{folder}/character_data.py")
 
-        module_name = py_file.stem
+    module_name = py_file.stem
 
-        # 动态导入
-        module = importlib.import_module(f"{folder.replace("/", ".")}.{module_name}")
+    # 动态导入
+    module = importlib.import_module(f"{folder.replace("/", ".")}.{module_name}")
 
-        # 找模块里的类
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            # 只处理本模块定义的类（排除导入的类）
-            if obj.__module__ == module.__name__:
-                instance = obj()
-                results.append(instance)  # type: ignore
-                print(f"已实例化 {module_name}.{name}")
+    # 找模块里的类
+    for name, obj in inspect.getmembers(module, inspect.isclass):
+        # 只处理本模块定义的类（排除导入的类）
+        if obj.__module__ == module.__name__ and name != "CharacterData":
+            instance = obj()
 
-    return {"characters": to_dict(results)}
+            character_dict = to_dict(instance)
+            character_dict.pop("id", None)
+
+            results[instance.id] = character_dict  # type: ignore
+            print(f"已实例化 {module_name}.{name}")
+
+    return {"characters": to_dict(results), "save": to_dict(SaveData())}
 
 
 def create_new_game():
