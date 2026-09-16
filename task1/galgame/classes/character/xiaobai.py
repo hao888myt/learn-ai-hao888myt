@@ -1,6 +1,6 @@
-from classes.core.romanceable_character import RomanceableCharacter
+from classes.core.character import Character
 
 
-class XiaoBai(RomanceableCharacter):
+class XiaoBai(Character):
     def __init__(self):
         super().__init__("小白")
