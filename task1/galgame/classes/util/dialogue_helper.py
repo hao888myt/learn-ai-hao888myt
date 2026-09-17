@@ -1,10 +1,10 @@
 import inspect
 import json
-from enum import Enum
 from pathlib import Path
 from typing import Any
 
 from classes.util.util import to_dict
+from const.enum import ConditionType, EffectType
 
 
 class Dialogue:
@@ -19,18 +19,10 @@ class Narration(Dialogue):
         self.content = content
 
 
-class ConditionType(Enum):
-    REQUIRED_AFFINITY = "required_affinity"
-
-
 class Condition:
     def __init__(self, type: ConditionType, value: Any) -> None:
         self.type = type
         self.value = value
-
-
-class EffectType(Enum):
-    MODIFY_AFFINITY = "modify_affinity"
 
 
 class Effect:
