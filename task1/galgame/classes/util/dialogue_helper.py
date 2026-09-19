@@ -134,4 +134,4 @@ class DialogueExporter:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"已生成 {file_name}.json 于 {output_path}")
+        # print(f"已生成 {file_name}.json 于 {output_path}")

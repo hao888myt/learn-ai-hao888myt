@@ -54,7 +54,6 @@ class DialoguePrinter:
     def typewriter(self, text: str):
         """逐字打印，标点减速，按键跳过"""
         for i, char in enumerate(text):
-            # ✅ 按键跳过
             if kbhit():
                 getch()
                 sys.stdout.write(text[i:])
@@ -68,6 +67,5 @@ class DialoguePrinter:
             time.sleep(self.delay * pause)
 
     def print_choices(self, choices: list[dict[str, Any]]):
-        """打印选项"""
         for i, c in enumerate(choices, 1):
             print(f"  {i}. {c['content']}")

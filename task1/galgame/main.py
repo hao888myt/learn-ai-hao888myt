@@ -9,6 +9,7 @@ from classes.data_class.save_data import SaveData
 from classes.loader.file_loader import FileLoader
 from classes.printer.dialogue_printer import DialoguePrinter
 from classes.util.util import get_galgame_path, to_dict
+from const.enum import ConditionType
 from const.path import SAVE_PATH, SCENE_PATH
 
 
@@ -25,7 +26,6 @@ def run_all_generators():
 
 
 def instantiate_all() -> dict[str, Any]:
-    """实例化character文件夹的所有类"""
     folder: str = "classes/data_class"
     results: dict[str, Any] = {}
 
@@ -77,6 +77,20 @@ def save_game(save_data: SaveData):
         json.dump(save, f, ensure_ascii=False, indent=2)
 
 
+def check_choice(choice: dict[str, Any], characters: dict[str, Any]) -> bool:
+    character = choice["character"]
+
+    for condition in choice.get("conditions", []):
+        match condition["type"]:
+            case ConditionType.REQUIRED_AFFINITY.value:
+                affinity = characters.get(character, {}).get("affinity", 0)
+                if affinity < condition["value"]:
+                    return False
+            case _:
+                pass
+    return True
+
+
 def game_loop():
     save_data, scene = load_game()
 
@@ -110,17 +124,28 @@ def game_loop():
         # 选项组
         elif group["type"] == "choice_group":
             print(f"\n{group['desc']}")
-            for i, choice in enumerate(group["choices"], 1):
+
+            choices = [
+                choice
+                for choice in group["choices"]
+                if check_choice(choice, save_data.characters)
+            ]
+
+            if not choices:
+                print("没有可用选项")
+                break
+
+            for i, choice in enumerate(choices, 1):
                 print(f"  {i}. {choice['content']}")
 
             while True:
                 raw = input("> ").strip()
-                if raw.isdigit() and 1 <= int(raw) <= len(group["choices"]):
+                if raw.isdigit() and 1 <= int(raw) <= len(choices):
                     index = int(raw) - 1
                     break
                 print("无效输入，请重新选择")
 
-            choice = group["choices"][index]
+            choice = choices[index]
 
             save_data.apply_effect(choice)
 
@@ -139,8 +164,7 @@ def game_loop():
 if __name__ == "__main__":
     run_all_generators()
 
-    folder = SAVE_PATH
-    if not any(folder.iterdir()):
+    if not any(SAVE_PATH.iterdir()):
         print("没有玩家存档，正在创建中")
         create_new_game()
 

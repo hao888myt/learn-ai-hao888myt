@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+from const.enum import EffectType
+
 
 @dataclass
 class SaveData:
@@ -51,7 +53,7 @@ class SaveData:
             value = effect["value"]
 
             match type:
-                case "modify_affinity":
+                case EffectType.MODIFY_AFFINITY.value:
                     if character in self.characters:
                         self.characters[character]["affinity"] += value
                 case _:
