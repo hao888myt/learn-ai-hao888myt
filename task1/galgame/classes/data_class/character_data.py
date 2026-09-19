@@ -5,6 +5,11 @@ from dataclasses import dataclass
 class CharacterData:
     id: str = "none"
     name: str = "none"
+    affinity: int = 0
+
+    @classmethod
+    def modify_affinity(cls, value: int):
+        cls.affinity += value
 
 
 @dataclass
