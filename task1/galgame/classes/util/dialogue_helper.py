@@ -31,6 +31,15 @@ class Effect:
         self.value = value
 
 
+def _get_caller_file() -> str:
+    SKIP = {"character", "dialogue_helper"}
+    for frame_info in inspect.stack():
+        filename = Path(frame_info.filename).stem
+        if filename not in SKIP:
+            return filename
+    return "unknown"
+
+
 class Choice:
     def __init__(
         self,
@@ -42,9 +51,7 @@ class Choice:
         self.character = character
         self.content = content
         self.group_to = group_to
-        self.file_to = (
-            Path(inspect.stack()[1].filename).stem if file_to == "" else file_to
-        )
+        self.file_to = file_to if file_to else _get_caller_file()
         self.effects: list[Effect] = []
         self.conditions: list[Condition] = []
 
