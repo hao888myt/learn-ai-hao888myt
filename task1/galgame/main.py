@@ -48,7 +48,10 @@ def instantiate_all() -> dict[str, Any]:
             results[instance.id] = character_dict  # type: ignore
             print(f"已实例化 {module_name}.{name}")
 
-    return {"characters": to_dict(results), "save": to_dict(SaveData())}
+    save_data = SaveData()
+    save_data.characters = to_dict(results)
+
+    return to_dict(save_data)
 
 
 def create_new_game():
@@ -59,27 +62,26 @@ def create_new_game():
 
 
 def load_game() -> tuple[SaveData, dict[str, Any]]:
-    data = FileLoader(SAVE_PATH, "data").get_json()
-    save = SaveData.from_dict(data["save"])
+    save = FileLoader(SAVE_PATH, "data").get_json()
+    save_data = SaveData.trans_from_dict(save)
 
-    scene = FileLoader(SCENE_PATH, save.current_file).get_json()
-    return save, scene
+    scene = FileLoader(SCENE_PATH, save_data.current_file).get_json()
+    return save_data, scene
 
 
-def save_game(save: SaveData):
-    data = FileLoader(SAVE_PATH, "data").get_json()
-    data["save"] = save.to_dict()
+def save_game(save_data: SaveData):
+    save = save_data.trans_to_dict()
 
     output_path = get_galgame_path() / SAVE_PATH / "data.json"
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(save, f, ensure_ascii=False, indent=2)
 
 
 def game_loop():
-    save, scene = load_game()
+    save_data, scene = load_game()
 
     while True:
-        group = scene.get(save.current_group)
+        group = scene.get(save_data.get_current_group())
         if not group:
             break
 
@@ -87,19 +89,23 @@ def game_loop():
         if group["type"] == "dialogue_group":
             dialogues = group["dialogues"]
 
-            if save.current_index >= len(dialogues):
-                save.current_group = group["group_to"]
-                save.current_index = 0
+            if save_data.get_current_index() >= len(dialogues):
+                save_data.to_group(group["group_to"])
 
-                if group.get("file_to") and group["file_to"] != save.current_file:
-                    save.current_file = group["file_to"]
-                    scene = FileLoader(SCENE_PATH, save.current_file).get_json()
+                if (
+                    group.get("file_to")
+                    and group["file_to"] != save_data.get_current_file()
+                ):
+                    save_data.to_file(group["file_to"])
+                    scene = FileLoader(
+                        SCENE_PATH, save_data.get_current_file()
+                    ).get_json()
                 continue
 
-            line = dialogues[save.current_index]
+            line = dialogues[save_data.get_current_index()]
             DialoguePrinter().print_line(line)
             getch()
-            save.current_index += 1
+            save_data.next_dialogue()
 
         # 选项组
         elif group["type"] == "choice_group":
@@ -116,15 +122,18 @@ def game_loop():
 
             choice = group["choices"][index]
 
-            save.apply_effect(choice)
+            save_data.apply_effect(choice)
 
-            save.to_group(choice["group_to"])
+            save_data.to_group(choice["group_to"])
 
-            if choice.get("file_to") and choice["file_to"] != save.current_file:
-                save.to_file(choice["file_to"])
-                scene = FileLoader(SCENE_PATH, save.current_file).get_json()
+            if (
+                choice.get("file_to")
+                and choice["file_to"] != save_data.get_current_file()
+            ):
+                save_data.to_file(choice["file_to"])
+                scene = FileLoader(SCENE_PATH, save_data.get_current_file()).get_json()
 
-        save_game(save)
+        save_game(save_data)
 
 
 if __name__ == "__main__":
